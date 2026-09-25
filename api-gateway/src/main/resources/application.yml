@@ -1,0 +1,68 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # Route 1: Movie Service
+        - id: movie-service
+          uri: lb://MOVIE-SERVICE
+          predicates:
+            - Path=/api/movies/**, /api/movies
+          filters:
+            - StripPrefix=1
+
+        # Route 2: Show Service
+        - id: show-service
+          uri: lb://SHOW-SERVICE
+          predicates:
+            - Path=/api/shows/**, /api/shows, /api/screens/**, /api/screens
+          filters:
+            - StripPrefix=1
+
+        # Route 3: User Service
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/auth/**, /api/auth, /api/users/**, /api/users
+          filters:
+            - StripPrefix=1
+
+        # Route 4: Booking Service (High-Concurrency Engine)
+        - id: booking-service
+          uri: lb://BOOKING-SERVICE
+          predicates:
+            - Path=/api/bookings/**, /api/bookings
+          filters:
+            - StripPrefix=1
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  secret: CinePassSuperSecretKeyForJWTSigning2026HighConcurrencyCinemaEngine!

@@ -1,0 +1,45 @@
+package com.cinepass.movieservice.controller;
+
+import com.cinepass.movieservice.model.Movie;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@RestController
+@RequestMapping("/movies")
+public class MovieController {
+
+    private final List<Movie> movies = new ArrayList<>();
+
+    @GetMapping
+    public List<Movie> getAllMovies() {
+        return movies;
+    }
+
+    @GetMapping("/{id}")
+    public Movie getMovieById(@PathVariable Long id) {
+
+        for (Movie movie : movies) {
+            if (movie.getId().equals(id)) {
+                return movie;
+            }
+        }
+
+        return null;
+    }
+
+    @PostMapping
+    public Movie addMovie(@RequestBody Movie movie) {
+        movies.add(movie);
+        return movie;
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteMovie(@PathVariable Long id) {
+
+        movies.removeIf(movie -> movie.getId().equals(id));
+
+        return "Movie deleted successfully";
+    }
+}
